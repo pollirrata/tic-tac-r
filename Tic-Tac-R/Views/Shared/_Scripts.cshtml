@@ -1,0 +1,310 @@
+﻿<script language="javascript" type="text/javascript">
+    $(function () {
+
+        var nick = '@(((Tic_Tac_R.Models.Player)HttpContext.Current.Session["player"]).Nick)';
+        var myRoom = "";
+        var myGuid = "";
+        var messages = "";
+        var imPlaying = "-";
+        var myTurn = false;
+
+        $("#help").click(function () {
+            smoke.alert("Create room in order to play with somebody else. You can also join to an existing room for start playing.\n\n" +
+                "When playing, you will see a small chat window on the right; this can be used for communicate with your opponent during the game.\n\n" +
+                "If for some reason you don't want to continue playing with the current oponent, you can leave the room pressing the button with that label and join or create another room.", { classname: "help-content" });
+        });
+
+        var gameEngine = $.connection.gameEngine;
+
+        // Start the connection
+        $.connection.hub.start({ transport: 'longPolling' }).done(function () {
+            assignConnectionId();
+        });
+        //console.log($.connection.hub);
+
+        function guidGenerator() {
+            var S4 = function () {
+                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+            };
+            return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+        }
+
+        //*****************************
+        //*** USER EVENTS
+        //******************************
+
+        //assign the connection id to the current player
+        assignConnectionId = function () {
+            myGuid = guidGenerator();
+            gameEngine.createPlayer(nick, myGuid);
+
+        } //assignConnectionId
+        gameEngine.assignConnectionId = assignConnectionId;
+
+
+        //***********************************************
+        //**** ROOM EVENTS
+        //***********************************************
+
+        $("#createRoom").click(function () {
+            if ($("#room").val() == "") {
+                smoke.alert("You need to specify a room name");
+                return false;
+            }
+            gameEngine.createRoom($("#room").val());
+        }); //click
+
+        var roomCreationStatus = function (status, success) {
+            if (success) {
+                myRoom = $("#room").val();
+                $("#room").val("");
+                $("#roomName").text(myRoom);
+                $("#chat").html("");
+                $("#game-controls").removeClass("invisible").addClass("room");
+                $("#game-rooms").removeClass("room").addClass("invisible");
+                
+            }
+            setStatus(status);
+        }
+        gameEngine.roomCreationStatus = roomCreationStatus;
+
+        var roomJoiningStatus = function (status, success) {
+            if (success) {
+                myRoom = $("#availableRooms").val();
+                $("#chat").html("");
+                $("#room").val("");
+            }
+            setStatus(status);
+        }
+        gameEngine.roomJoiningStatus = roomJoiningStatus;
+
+
+        $("#joinRoom").click(function () {
+            if ($("#availableRooms").val() == null
+                || $("#availableRooms").val() == undefined
+                || $("#availableRooms").val() == "") {
+                smoke.alert("You need to select a room to join");
+                return false;
+            }
+            if ($("#availableRooms").val() == myRoom) {
+                smoke.alert("You cannot join the same room twice");
+                return false;
+            }
+            gameEngine.joinRoom($("#availableRooms").val());
+            //console.log("selected room: " + $("#availableRooms").val());
+        }); //click
+
+
+        var oponentLeft = function () {
+            //console.log("Oponent left");
+            status = "Oponent left, waiting for a new oponent";
+            setStatus(status);
+            smoke.alert(status);
+            if (imPlaying == "X") {
+                $("#oPlayer").text("");
+            } else {
+                $("#xPlayer").text("");
+            }
+        }
+        gameEngine.oponentLeft = oponentLeft;
+
+        //updates the list of available rooms to play
+        var updateRooms = function (availableRooms, fullRooms, players) {
+            $("#playerCount").text("Players online: " + players.toString());
+            //console.log(availableRooms);
+            $("#availableRooms").children().remove();
+            $(availableRooms).each(function (index, room) {
+                //console.log("My room: " + myRoom);
+                $("#availableRooms").append($("<option></option>")
+                    .attr("value", room)
+                    .text(room));
+            }); //each
+
+            $("#fullRooms").children().remove();
+            $(fullRooms).each(function (index, room) {
+                //console.log(room);
+                $("#fullRooms").append($("<option></option>")
+                    .attr("value", room)
+                    .text(room));
+            }); //each
+        } //updateRooms
+        gameEngine.updateRooms = updateRooms;
+
+        //*****************************
+        //*** GAME EVENTS
+        //*****************************
+
+        //change the status text
+        var setStatus = function (status) {
+            $("#status").text(status);
+            //console.log("Status: " + status);
+            $(".status-info").effect("highlight", { color: "#f0f0f0" }, 2000);
+        }
+        gameEngine.setStatus = setStatus;
+
+
+        //starts (or restart) the game
+        var startGame = function (xPlayer, oPlayer, xNick, oNick, currentRoom) {
+            imPlaying = xPlayer == myGuid ? "X" : "O";
+            myRoom = currentRoom;
+            $("#xPlayer").text(xNick);
+            $("#oPlayer").text(oNick);
+            $("#roomName").text(currentRoom);
+            setStatus("Waiting for the oponent to start");
+            switchTurn(xPlayer, xNick);
+            $("#playAgain").addClass("invisible");
+            $("table.board td").addClass("available");
+            $("table.board td").removeClass("occupied");
+            $("table.board td").removeClass("win");
+            $("table.board td").click(move);
+            $("table.board td div").text("");
+            $("#game-chat").removeClass("invisible").addClass("room");
+            $("#game-rooms").addClass("invisible").removeClass("room");
+            $("#game-controls").removeClass("invisible").addClass("room");
+        }
+        gameEngine.startGame = startGame;
+
+
+        //finishes the game when somebody wins
+        gameEngine.endGame = function (player, combination) {
+            var message;
+            if (player == myGuid) {
+                message = "You win :)";
+            } else {
+                message = "Better luck next time :(";
+            }
+            smoke.alert(message);
+            setStatus(message);
+
+            var combination = combination.split('-');
+            //console.log(combination);
+            $(combination).each(function (index, item) {
+                cell = item.split(',');
+                cell = $("table.board td[xpos=" + cell[0] + "][ypos=" + cell[1] + "]");
+                cell.addClass("win");
+                //don't allow the user to continue playing
+                $("table.board td").removeClass("available");
+                $("table.board td").unbind("click");
+                $(".board").addClass("blocked").removeClass("unblocked");
+                $("#playAgain").removeClass("invisible");
+            }); //each
+        }; //end game
+
+        var leaveRoom = function () {
+            $("table.board td").removeClass("available");
+            $("table.board td").unbind("click");
+            $("table.board td").removeClass("occupied");
+            $("#xPlayer").text("");
+            $("#oPlayer").text("");
+            $("#roomName").text("");
+            setStatus("Select or create a room");
+            myRoom = "";
+            $("#playAgain").addClass("invisible");
+            $("table.board td").removeClass("win");
+            $("table.board td div").text("");
+            $("#game-chat").addClass("invisible").removeClass("room");
+            $("#game-rooms").removeClass("invisible").addClass("room");
+            $("#game-controls").addClass("invisible").removeClass("room");
+
+            //console.log("Leaving room");
+        }
+        gameEngine.leaveRoom = leaveRoom;
+
+        //handles the move of the player
+        var move = function () {
+            if (!myTurn) return false;
+            gameEngine.move($(this).attr("xpos"), $(this).attr("ypos"));
+        } //move
+        $("table.board.unblocked td.available").click(move);
+
+
+        //add the mark from the opponent's move
+        var addMark = function (mark, x, y, win) {
+            cell = $("table.board td[xpos=" + x + "][ypos=" + y + "]");
+            $(cell).children().text(mark);
+            $(cell).addClass("occupied");
+            $(cell).removeClass("available");
+            $(cell).unbind("click");
+
+            //console.log("Moves left: " + $("table.board td.available").size());
+            //console.log(win);
+            if ($("table.board td.available").size() <= 0 && !win) {
+                gameEngine.nobodyWins($.connection.hub.groups[1].split(".")[1]);
+                gameEngine.setGameStatus(myRoom, "Nobody wins :(");
+                smoke.alert("Nobody wins :(");
+            }
+        }
+        gameEngine.addMark = addMark;
+
+
+        //switch turns between users
+        var switchTurn = function (player, nick) {
+            myTurn = player == myGuid;
+            //console.log("Is it my turn? " + myTurn);
+            if (myTurn) {
+                setStatus("Your turn");
+                $(".board").removeClass("blocked").addClass("unblocked");
+            } else {
+                setStatus(nick + "'s turn");
+                $(".board").addClass("blocked").removeClass("unblocked");
+            }
+        };
+        gameEngine.switchTurn = switchTurn;
+
+        var ack = function () {
+            $.noticeAdd({
+                text: 'Call received on server',
+                stay: false
+            })
+        }
+        gameEngine.ack = ack;
+
+        //displays the Play again button
+        gameEngine.showPlayAgain = function () {
+            $("#playAgain").removeClass("invisible");
+        }
+
+
+        //Starts a new game
+        $("#playAgain").click(function () {
+            gameEngine.playAgain();
+        });
+
+
+        $("#leaveRoom").click(function () {
+            smoke.confirm("Are you sure you want to leave this room?", function (e) {
+                if (e) {
+                    //console.log("Leaving room confirmed");
+                    gameEngine.leavingRoom();
+                }
+            });
+        });
+
+
+        //******************************************************
+        // CHAT EVENTS
+        //******************************************************
+        var broadcastMessage = function (message) {
+            //console.log(message);
+            $("#chat").html($("#chat").html() + message + "<br />");
+            var height = $('#chat')[0].scrollHeight;
+            $('#chat').scrollTop(height);
+        }
+        gameEngine.broadcastMessage = broadcastMessage;
+
+        var sendMessage = function () {
+            var message = $("#message").val();
+            if (message == "") return false;
+            $("#message").val("");
+            gameEngine.sendMessage(message);
+        }
+
+        $("#send-message").click(sendMessage);
+        $("#message").keypress(function (event) {
+            if (event.which == 13) {
+                sendMessage();
+            }
+        });
+
+    });
+</script>

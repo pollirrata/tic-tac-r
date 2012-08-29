@@ -1,0 +1,295 @@
+body
+{
+    font-size: .85em;
+    font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
+    color: #232323;
+    background-color: #fff;
+}
+
+
+/* Styles for basic forms
+-----------------------------------------------------------*/
+
+legend
+{
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+textarea
+{
+    min-height: 75px;
+}
+
+
+
+/* Styles for validation helpers
+-----------------------------------------------------------*/
+.field-validation-error
+{
+    color: #cc0000;
+}
+
+.field-validation-valid
+{
+    display: none;
+}
+
+.input-validation-error
+{
+    border: 1px solid #ff0000;
+    background-color: #ffeeee;
+}
+
+.validation-summary-errors
+{
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.validation-summary-valid
+{
+    display: none;
+}
+
+
+/*****GAME STYLES*****/
+
+h1.big
+{
+    text-align: center;
+    color: #791F33;
+    font-size: 90px !important;
+    text-shadow: 5px 5px 5px #BA3D49;
+}
+
+.invisible
+{
+    display: none;
+}
+
+span#status
+{
+    font-size: 20px;
+    display:block;
+}
+
+div#content
+{
+    width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div#step-1
+{
+    width: 400px;
+    height: 80px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div#step-2
+{
+    width: 300px;
+}
+
+div#step-2, div#game
+{
+    width: 400px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+input
+{
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+    input[type=button]
+    {
+        background-color: #791F33;
+        min-width: 50px;
+        color: White;
+    }
+
+fieldset
+{
+    border: 1px solid #ddd;
+    padding: 0 1.4em 1.4em 1.4em;
+    margin: 0 0 1.5em 0;
+    background-color: #F69162;
+    border-radius: 10px;
+    padding-top: 10px;
+}
+
+    fieldset legend
+    {
+        position: relative;
+        top: -10px;
+        text-align: left;
+    }
+
+    fieldset.room
+    {
+        display: inline-block;
+        vertical-align: top;
+        width: 300px;
+        height: 100px;
+    }
+
+#game .game-info div
+{
+    margin: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+    border-radius: 5px;
+    padding: 3px;
+    height: 20px;
+    text-align: center;
+    color: Whitesmoke;
+}
+
+#game label
+{
+    display: inline-block;
+    width: 60px;
+    font-weight: bold;
+}
+
+#game .user-info
+{
+    background-color: #C24704;
+}
+
+#game .status-info
+{
+    background-color: #D9CC3C;
+    min-height: 40px !important;
+    height: auto !important;
+    color: #333333;
+}
+
+#game .players
+{
+    background-color: #00ADA7;
+}
+
+table.board
+{
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    table.board.blocked td div
+    {
+        background-color: #D2D2D2;
+    }
+
+    table.board td
+    {
+        width: 100px;
+        height: 100px;
+        text-align: center;
+        vertical-align: middle;
+        border: solid 2px black;
+        font-size: 50px;
+        color: #85A562;
+        padding: 5px;
+    }
+
+        table.board td div
+        {
+            width: 90px;
+            padding-top: 10px;
+            height: 80px;
+            border-radius: 5px;
+            text-align: center;
+            vertical-align: middle;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.board td.occupied div
+        {
+            border: solid 3px #85A562;
+        }
+
+        table.board td.win div
+        {
+            color: #CC0000;
+            border-color: #CC0000;
+        }
+
+        table.board td.top
+        {
+            border-top: none;
+        }
+
+        table.board td.bottom
+        {
+            border-bottom: none;
+        }
+
+        table.board td.left
+        {
+            border-left: none;
+        }
+
+        table.board td.right
+        {
+            border-right: none;
+        }
+
+fieldset#game-chat
+{
+    width: 300px;
+    height: auto;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+    fieldset#game-chat div
+    {
+        margin-left: auto;
+        margin-right: auto;
+        background-color: white;
+        padding-left: 10px;
+        overflow-y: auto;
+        height: 160px;
+        width: 265px;
+        text-align: left;
+        border-radius: 5px 5px 0 0;
+    }
+
+    fieldset#game-chat input[type='text']
+    {
+        margin-top: 5px;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 0 0 5px 5px;
+        width: 265px;
+    }
+
+#help
+{
+    position: fixed;
+    bottom: 0px;
+    padding: 5px;
+    background-color: #C24704;
+    min-width: 70px;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+.help-content
+{
+    font-size: 11px !important;
+    text-transform: none !important;
+    text-align: left !important;
+    font-weight: normal !important;
+}

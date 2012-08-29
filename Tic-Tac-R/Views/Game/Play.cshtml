@@ -1,0 +1,116 @@
+﻿@using Tic_Tac_R.Models;
+@model Room
+@{
+    ViewBag.Title = "Index";
+}
+<div id="content">
+    <div id="game" class="">
+        <div class="game-info">
+            <div class="user-info">
+                <label>
+                    User:</label>
+                <span id="nickName">
+                    @if (HttpContext.Current.Session["player"] as Player != null)
+                    {
+                        @Html.Encode((HttpContext.Current.Session["player"] as Player).Nick);
+                    }
+                </span>
+                <label>
+                    Room:</label>
+                <span id="roomName"></span>
+            </div>
+            <div class="status-info">
+                <label>
+                    Status:</label>
+                <span id="status">Create or select a room</span>
+                <input type="button" value="Play again" id="playAgain" class="invisible" />
+            </div>
+            <div class="players">
+                <label>
+                    X:</label>
+                <span id="xPlayer"></span>
+                <label>
+                    O:</label>
+                <span id="oPlayer"></span>
+            </div>
+        </div>
+        <table class="board unblocked">
+            <tr>
+                <td class="left top" xpos="0" ypos="0">
+                    <div>
+                    </div>
+                </td>
+                <td class="center top" xpos="1" ypos="0">
+                    <div>
+                    </div>
+                </td>
+                <td class="right top" xpos="2" ypos="0">
+                    <div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="left middle" xpos="0" ypos="1">
+                    <div>
+                    </div>
+                </td>
+                <td class="center middle" xpos="1" ypos="1">
+                    <div>
+                    </div>
+                </td>
+                <td class="right middle" xpos="2" ypos="1">
+                    <div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="left bottom" xpos="0" ypos="2">
+                    <div>
+                    </div>
+                </td>
+                <td class="center bottom" xpos="1" ypos="2">
+                    <div>
+                    </div>
+                </td>
+                <td class="right bottom" xpos="2" ypos="2">
+                    <div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="step-2">
+        <fieldset class="room" id="game-rooms" style="height: auto;">
+            <legend>Rooms</legend>
+            <strong>Create</strong><br />
+            <input id="room"  value="@*room@(System.DateTime.Now.ToString("ssmmdd"))*@"/>
+            <input type="button" value="Create" id="createRoom" />
+            <hr />
+            <strong>Join</strong><br />
+            <select size="4" id="availableRooms" style="width: 100%;">
+            </select><br />
+            <input type="button" value="Join" id="joinRoom" />
+            <hr />
+            <strong>Full rooms</strong><br />
+            <select size="4" id="fullRooms" style="width: 100%;">
+            </select>
+        </fieldset>
+        <fieldset id="game-controls" class="invisible" style="height: auto;">
+            <legend></legend>
+            <input type="button" id="leaveRoom" value="Leave Room" />
+        </fieldset>
+        <fieldset id="game-chat" class="invisible">
+            <legend>Chat</legend>
+            <div id="chat"></div>
+            <input type="text" id="message" />
+            <input type="button" id="send-message" value="Send message" />
+        </fieldset>
+        <fieldset class="room" style="text-align: center; height: 60px;">
+            <h1 id="playerCount"></h1>
+        </fieldset>
+    </div>
+</div>
+@RenderPage("~/Views/Shared/_Scripts.cshtml")
+<div id="help">
+    Help
+</div>

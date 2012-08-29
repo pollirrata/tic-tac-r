@@ -1,0 +1,16 @@
+﻿@model Tic_Tac_R.Models.Player
+@{
+    ViewBag.Title = "Index";
+}
+<h1 class="big">Tic - Tac - R</h1>
+@using (@Html.BeginForm())
+{
+    <div id="step-1">
+        <fieldset>
+            <legend>Select your nickname</legend>
+            @Html.TextBoxFor(model => model.Nick)
+            <input type="submit" value="GO!" />
+            <br />@Html.ValidationMessageFor(model => model.Nick)
+        </fieldset>
+    </div>
+}

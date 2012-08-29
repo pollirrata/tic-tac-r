@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/plugins/notice/jquery.notice.css")" type="text/css" media="screen" />
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/plugins/smoke/smoke.css")" type="text/css" media="screen" />
+
+    <script src="@Url.Content("~/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-1.6.4.min.js")" type="text/javascript"></script>
+    <script src="http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+
+    <script src="@Url.Content("~/Scripts/plugins/notice/jquery.notice.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/plugins/smoke/smoke.min.js")" type="text/javascript"></script>
+
+    <script src="@Url.Content("~/Scripts/jquery.signalR-0.5.3.min.js")" type="text/javascript"></script>
+    <script type="text/javascript" src='@Url.Content("~/signalr/hubs")'></script>
+    @RenderPage("~/Views/Shared/_Analytics.cshtml")
+</head>
+
+<body>
+    @RenderPage("~/Views/Shared/_Social.cshtml")
+    @RenderBody()
+</body>
+</html>
